@@ -1,4 +1,6 @@
-#Discord ArchiveBot v1.0.0 by DJVoxel#2226
+#Discord ArchiveBot v1.0.0
+#Copyright (c) 2019 DJVoxel
+#Distributed under the MIT License
 
 from concurrent.futures import ThreadPoolExecutor
 
