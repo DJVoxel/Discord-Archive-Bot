@@ -1,4 +1,4 @@
-#Discord ArchiveBot v1.0.0
+#Discord ArchiveBot v1.0.4
 #Copyright (c) 2019 DJVoxel
 #All Rights Reserved
 
@@ -34,7 +34,7 @@ service = build('drive', 'v3', http=credz.authorize(Http()))
 
 command_prefix = ']'
 
-bot_key = '<Bot key goes here>'
+bot_key = '<Insert Bot Key Here>'
 
 bot = commands.Bot(command_prefix)
 
@@ -81,10 +81,6 @@ def share_folder(folder_id):
 async def on_ready():
     print (bot.user.name, "is ready!")
     print ("Id:", bot.user.id)
-    for guild in bot.guilds:
-        role_check = discord.utils.get(guild.roles, name="Archivist")
-        if role_check is None:
-            guild.create_role(name="Archivist")
     print ("Ready to Archive!")
 
 @bot.command()
@@ -118,11 +114,11 @@ async def archives(ctx):
 
 
 @bot.command()
-@commands.has_role('Archivist')
+@commands.has_permissions(manage_messages=True)
 async def archive(ctx, channel : discord.TextChannel, filename, start, end):
     await ctx.send("Archiving....")
     try:
-        with open("{}.txt".format(filename), "w") as openfile:
+        with open("{}.txt".format(filename), "w", encoding='utf8') as openfile:
             lines = []
             startmessage = await channel.fetch_message(start)
             endmessage = await channel.fetch_message(end)
@@ -178,16 +174,16 @@ async def archive(ctx, channel : discord.TextChannel, filename, start, end):
         print (e)
     
 @archive.error
-async def archive_error(error, ctx):
+async def archive_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
-        await ctx.send("You do not have the Archivist role.")
+        await ctx.send("You do not have permission to archive messages.")
 
 @bot.command()
-@commands.has_role('Archivist')
+@commands.has_permissions(manage_messages=True)
 async def archivechannel(ctx, channel : discord.TextChannel, filename):
     await ctx.send("Archiving....")
     try:
-        with open("{}.txt".format(filename), "w") as openfile:
+        with open("{}.txt".format(filename), "w",encoding='utf8') as openfile:
             lines = []
             async for message in channel.history(limit=500, oldest_first=True):
                 if not (message.author.bot or message.content.startswith(command_prefix)):
@@ -237,8 +233,8 @@ async def archivechannel(ctx, channel : discord.TextChannel, filename):
         print(e)
     
 @archivechannel.error
-async def archivechannel_error(error, ctx):
+async def archivechannel_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
-        await ctx.send("You do not have the Archivist role.")
+        await ctx.send("You do not have permission to archive messages.")
 
 bot.run(bot_key)
